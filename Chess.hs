@@ -84,8 +84,9 @@ tests = TestList $ map TestCase
 prop_empty c1 = (c1::Int) == c1
 
 runTests = do
-  runTestTT tests
-  quickCheck prop_empty
+  -- runTestTT tests
+  -- quickCheck prop_empty
+  return ()
 
 -- | For now, main will run our tests.
 main :: IO ()
