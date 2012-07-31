@@ -1,6 +1,7 @@
 guard :shell do
   watch /.*\.l?hs$/ do |m|
-    `runghc #{m[0]}`
+    puts "Compiling..."
+    `runghc #{m[0]} && echo "Compiled!"`
   end
 end
 
