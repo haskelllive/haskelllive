@@ -12,8 +12,8 @@ initialBoardStr = unlines ["rnbqkbnr"
                           ,"        "
                           ,"        "
                           ,"        "
-                          ,"pppppppp"
-                          ,"rnbqkbnr"
+                          ,"PPPPPPPP"
+                          ,"RNBQKBNR"
                           ]
 
 readBoard :: String -> Board
