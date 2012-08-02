@@ -12,8 +12,8 @@ initialBoardStr = unlines ["rnbqkbnr"
                           ,"        "
                           ,"        "
                           ,"        "
-                          ,"pppppppp"
-                          ,"rnbqkbnr"
+                          ,"PPPPPPPP"
+                          ,"RNBQKBNR"
                           ]
 
 readBoard :: String -> Board
@@ -62,18 +62,18 @@ showPiece (Piece Black King)   = 'k'
 -- * White pieces are "PNBRQG"
 -- * Black pieces are "pnbrqg"
 readPiece :: Char -> Piece
-readPiece 'P' = (Piece White Pawn)
-readPiece 'N' = (Piece White Knight)
-readPiece 'B' = (Piece White Bishop)
-readPiece 'R' = (Piece White Rook)
-readPiece 'Q' = (Piece White Queen)
-readPiece 'K' = (Piece White King)
-readPiece 'p' = (Piece Black Pawn)
-readPiece 'n' = (Piece Black Knight)
-readPiece 'b' = (Piece Black Bishop)
-readPiece 'r' = (Piece Black Rook)
-readPiece 'q' = (Piece Black Queen)
-readPiece 'k' = (Piece Black King)
+readPiece 'P' = Piece White Pawn
+readPiece 'N' = Piece White Knight
+readPiece 'B' = Piece White Bishop
+readPiece 'R' = Piece White Rook
+readPiece 'Q' = Piece White Queen
+readPiece 'K' = Piece White King
+readPiece 'p' = Piece Black Pawn
+readPiece 'n' = Piece Black Knight
+readPiece 'b' = Piece Black Bishop
+readPiece 'r' = Piece Black Rook
+readPiece 'q' = Piece Black Queen
+readPiece 'k' = Piece Black King
 
 -- Tests
 
