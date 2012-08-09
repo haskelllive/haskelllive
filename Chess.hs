@@ -2,27 +2,29 @@
 module Chess where
 
 import Test.HUnit
-import Test.QuickCheck
+-- import Test.QuickCheck
+
+import Data.Char
+import Control.Error.Util (note)
 
 type Board = [[Square]]
 
+initialBoardStr ::  String
 initialBoardStr = unlines ["rnbqkbnr"
                           ,"pppppppp"
-                          ,"        "
-                          ,"        "
-                          ,"        "
-                          ,"        "
-                          ,"pppppppp"
-                          ,"rnbqkbnr"
+                          ,"........"
+                          ,"........"
+                          ,"........"
+                          ,"........"
+                          ,"PPPPPPPP"
+                          ,"RNBQKBNR"
                           ]
 
-readBoard :: String -> Board
-readBoard = map readRow . lines
-  where readRow = map readSquare
+readBoard ::  String -> Either String Board
+readBoard = (mapM . mapM) readSquare . lines
 
 showBoard :: Board -> String
-showBoard = unlines . map showRow
-  where showRow = map showSquare
+showBoard = unlines . (map . map) showSquare
 
 type Square = Maybe Piece
 
@@ -31,9 +33,10 @@ showSquare :: Square -> Char
 showSquare = maybe ' ' showPiece
 
 -- | Read a square using FEN notation or ' ' for an empty square.
-readSquare :: Char -> Square
-readSquare ' ' = Nothing
-readSquare c   = Just (readPiece c)
+readSquare :: Char -> Either String Square
+readSquare '.' = return Nothing
+readSquare  c  = note errormsg $ fmap return (readPiece c)
+  where errormsg = "Error reading square: " ++ show c ++ " is not a valid square"
 
 data Piece = Piece PColor PType deriving (Show)
 data PColor = White | Black deriving (Show)
@@ -57,33 +60,37 @@ showPiece (Piece Black Rook)   = 'r'
 showPiece (Piece Black Queen)  = 'q'
 showPiece (Piece Black King)   = 'k'
 
+typeList :: [(Char, PType)]
+typeList =  [('p', Pawn)
+            ,('n', Knight)
+            ,('b', Bishop)
+            ,('r', Rook)
+            ,('q', Queen)
+            ,('k', King)
+            ]
+
 -- | Reads a piece using FEN notation.
 --
 -- * White pieces are "PNBRQG"
 -- * Black pieces are "pnbrqg"
-readPiece :: Char -> Piece
-readPiece 'P' = (Piece White Pawn)
-readPiece 'N' = (Piece White Knight)
-readPiece 'B' = (Piece White Bishop)
-readPiece 'R' = (Piece White Rook)
-readPiece 'Q' = (Piece White Queen)
-readPiece 'K' = (Piece White King)
-readPiece 'p' = (Piece Black Pawn)
-readPiece 'n' = (Piece Black Knight)
-readPiece 'b' = (Piece Black Bishop)
-readPiece 'r' = (Piece Black Rook)
-readPiece 'q' = (Piece Black Queen)
-readPiece 'k' = (Piece Black King)
+readPiece :: Char -> Maybe Piece
+readPiece c = fmap makePiece lookupType
+  where color      = if isUpper c then White else Black
+        lookupType = lookup (toLower c) typeList
+        makePiece  = Piece color
 
 -- Tests
 
+tests ::  Test
 tests = TestList $ map TestCase
-  [assertEqual "add tests here"  1 1
+  [assertEqual "add tests here"  1 (1 :: Int)
   ]
 
+prop_empty ::  Int -> Bool
 prop_empty c1 = (c1::Int) == c1
 
-runTests = do
+runTests ::  IO ()
+runTests =
   -- runTestTT tests
   -- quickCheck prop_empty
   return ()
