@@ -30,7 +30,7 @@ type Square = Maybe Piece
 
 -- | Show a square using FEN notation or ' ' for an empty square.
 showSquare :: Square -> Char
-showSquare = maybe ' ' showPiece
+showSquare = maybe '.' showPiece
 
 -- | Read a square using FEN notation or ' ' for an empty square.
 readSquare :: Char -> Either String Square
