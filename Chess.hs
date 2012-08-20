@@ -58,19 +58,19 @@ charColor :: Char -> PColor
 charColor c | isUpper c = White
             | otherwise = Black
 
-typeToChar :: PType -> Char
-typeToChar Pawn   = 'p'
-typeToChar Knight = 'k'
-typeToChar Bishop = 'b'
-typeToChar Rook   = 'r'
-typeToChar Queen  = 'q'
-typeToChar King   = 'k'
+whiteChars :: PType -> Char
+whiteChars Pawn   = 'p'
+whiteChars Knight = 'k'
+whiteChars Bishop = 'b'
+whiteChars Rook   = 'r'
+whiteChars Queen  = 'q'
+whiteChars King   = 'k'
 
 charToType :: Char -> Maybe PType
-charToType c = lookup (toLower c) typeList
+charToType c = lookup (colorChar White) whiteTypes
 
-typeList :: [(Char, PType)]
-typeList = map (typeToChar &&& id) (enumFrom Pawn)
+whiteTypes :: [(Char, PType)]
+whiteTypes = map (whiteChars &&& id) (enumFrom Pawn)
 
 -- | Reads a piece using FEN notation.
 --
