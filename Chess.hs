@@ -55,7 +55,7 @@ newtype ColoredChar a = ColoredChar { unCC :: Char }
                       deriving (Show, Bounded, Enum, Eq, Ord, Read )
 
 showPiece :: Piece -> Char
-showPiece (Piece color ptype) = colorChar color . unCC . typeToChar $ ptype
+showPiece (Piece color ptype) = colorChar color . unCC . typeToWhiteChar $ ptype
 
 colorCharBlack :: Char -> ColoredChar Black
 colorCharBlack = ColoredChar . colorChar Black
@@ -71,19 +71,19 @@ charColor :: Char -> PColor
 charColor c | isUpper c = White
             | otherwise = Black
 
-typeToChar :: PType -> ColoredChar White
-typeToChar Pawn   = ColoredChar 'p'
-typeToChar Knight = ColoredChar 'k'
-typeToChar Bishop = ColoredChar 'b'
-typeToChar Rook   = ColoredChar 'r'
-typeToChar Queen  = ColoredChar 'q'
-typeToChar King   = ColoredChar 'k'
+typeToWhiteChar :: PType -> ColoredChar White
+typeToWhiteChar Pawn   = ColoredChar 'p'
+typeToWhiteChar Knight = ColoredChar 'k'
+typeToWhiteChar Bishop = ColoredChar 'b'
+typeToWhiteChar Rook   = ColoredChar 'r'
+typeToWhiteChar Queen  = ColoredChar 'q'
+typeToWhiteChar King   = ColoredChar 'k'
 
 charToType :: Char -> Maybe PType
 charToType c = lookup (colorCharWhite c) whiteTypes
 
 whiteTypes :: [(ColoredChar White, PType)]
-whiteTypes = map (typeToChar &&& id) (enumFrom Pawn)
+whiteTypes = map (typeToWhiteChar &&& id) (enumFrom Pawn)
 
 -- | Reads a piece using FEN notation.
 --
