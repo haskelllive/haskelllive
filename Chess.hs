@@ -1,3 +1,6 @@
+{-# LANGUAGE EmptyDataDecls #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 -- | This is the documentation for the module Chess.
 module Chess where
 
@@ -6,6 +9,8 @@ import Test.HUnit
 
 import Data.Char
 import Control.Error.Util (note)
+import Control.Arrow ((&&&))
+import Control.Applicative
 
 type Board = [[Square]]
 
@@ -40,44 +45,52 @@ readSquare  c  = note errormsg $ fmap return (readPiece c)
 
 data Piece = Piece PColor PType deriving (Show)
 data PColor = White | Black deriving (Show)
-data PType = Pawn | Knight | Bishop | Rook | Queen | King deriving (Show)
+data PType = Pawn | Knight | Bishop | Rook | Queen | King
+           deriving (Show, Eq, Enum)
 
--- | Shows a piece using FEN notation.
---
--- * White pieces are "PNBRQG"
--- * Black pieces are "pnbrqg"
+data White
+data Black
+
+newtype ColoredChar a = ColoredChar { unCC :: Char }
+                      deriving (Show, Bounded, Enum, Eq, Ord, Read )
+
 showPiece :: Piece -> Char
-showPiece (Piece White Pawn)   = 'P'
-showPiece (Piece White Knight) = 'N'
-showPiece (Piece White Bishop) = 'B'
-showPiece (Piece White Rook)   = 'R'
-showPiece (Piece White Queen)  = 'Q'
-showPiece (Piece White King)   = 'K'
-showPiece (Piece Black Pawn)   = 'p'
-showPiece (Piece Black Knight) = 'n'
-showPiece (Piece Black Bishop) = 'b'
-showPiece (Piece Black Rook)   = 'r'
-showPiece (Piece Black Queen)  = 'q'
-showPiece (Piece Black King)   = 'k'
+showPiece (Piece color ptype) = colorChar color . unCC . typeToWhiteChar $ ptype
 
-typeList :: [(Char, PType)]
-typeList =  [('p', Pawn)
-            ,('n', Knight)
-            ,('b', Bishop)
-            ,('r', Rook)
-            ,('q', Queen)
-            ,('k', King)
-            ]
+colorCharBlack :: Char -> ColoredChar Black
+colorCharBlack = ColoredChar . colorChar Black
+
+colorCharWhite :: Char -> ColoredChar White
+colorCharWhite = ColoredChar . colorChar White
+
+colorChar :: PColor -> Char -> Char
+colorChar White = toUpper
+colorChar Black = toLower
+
+charColor :: Char -> PColor
+charColor c | isUpper c = White
+            | otherwise = Black
+
+typeToWhiteChar :: PType -> ColoredChar White
+typeToWhiteChar Pawn   = ColoredChar 'p'
+typeToWhiteChar Knight = ColoredChar 'k'
+typeToWhiteChar Bishop = ColoredChar 'b'
+typeToWhiteChar Rook   = ColoredChar 'r'
+typeToWhiteChar Queen  = ColoredChar 'q'
+typeToWhiteChar King   = ColoredChar 'k'
+
+charToType :: Char -> Maybe PType
+charToType c = lookup (colorCharWhite c) whiteTypes
+
+whiteTypes :: [(ColoredChar White, PType)]
+whiteTypes = map (typeToWhiteChar &&& id) (enumFrom Pawn)
 
 -- | Reads a piece using FEN notation.
 --
 -- * White pieces are "PNBRQG"
 -- * Black pieces are "pnbrqg"
 readPiece :: Char -> Maybe Piece
-readPiece c = fmap makePiece lookupType
-  where color      = if isUpper c then White else Black
-        lookupType = lookup (toLower c) typeList
-        makePiece  = Piece color
+readPiece c = Piece <$> Just (charColor c) <*> charToType c
 
 -- Tests
 
