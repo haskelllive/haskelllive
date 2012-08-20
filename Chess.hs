@@ -1,3 +1,6 @@
+{-# LANGUAGE EmptyDataDecls #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 -- | This is the documentation for the module Chess.
 module Chess where
 
@@ -6,8 +9,6 @@ import Test.HUnit
 
 import Data.Char
 import Control.Error.Util (note)
-import Data.Maybe (fromMaybe)
-import Data.List (find)
 import Control.Arrow ((&&&))
 import Control.Applicative
 
@@ -47,8 +48,20 @@ data PColor = White | Black deriving (Show)
 data PType = Pawn | Knight | Bishop | Rook | Queen | King
            deriving (Show, Eq, Enum)
 
+data White
+data Black
+
+newtype ColoredChar a = ColoredChar { unCC :: Char }
+                      deriving (Show, Bounded, Enum, Eq, Ord, Read )
+
 showPiece :: Piece -> Char
-showPiece (Piece color ptype) = colorChar color . typeToChar $ ptype
+showPiece (Piece color ptype) = colorChar color . unCC . typeToChar $ ptype
+
+colorCharBlack :: Char -> ColoredChar Black
+colorCharBlack = ColoredChar . colorChar Black
+
+colorCharWhite :: Char -> ColoredChar White
+colorCharWhite = ColoredChar . colorChar White
 
 colorChar :: PColor -> Char -> Char
 colorChar White = toUpper
@@ -58,19 +71,19 @@ charColor :: Char -> PColor
 charColor c | isUpper c = White
             | otherwise = Black
 
-whiteChars :: PType -> Char
-whiteChars Pawn   = 'p'
-whiteChars Knight = 'k'
-whiteChars Bishop = 'b'
-whiteChars Rook   = 'r'
-whiteChars Queen  = 'q'
-whiteChars King   = 'k'
+typeToChar :: PType -> ColoredChar White
+typeToChar Pawn   = ColoredChar 'p'
+typeToChar Knight = ColoredChar 'k'
+typeToChar Bishop = ColoredChar 'b'
+typeToChar Rook   = ColoredChar 'r'
+typeToChar Queen  = ColoredChar 'q'
+typeToChar King   = ColoredChar 'k'
 
 charToType :: Char -> Maybe PType
-charToType c = lookup (colorChar White) whiteTypes
+charToType c = lookup (colorCharWhite c) whiteTypes
 
-whiteTypes :: [(Char, PType)]
-whiteTypes = map (whiteChars &&& id) (enumFrom Pawn)
+whiteTypes :: [(ColoredChar White, PType)]
+whiteTypes = map (typeToChar &&& id) (enumFrom Pawn)
 
 -- | Reads a piece using FEN notation.
 --
